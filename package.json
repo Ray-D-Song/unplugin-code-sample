@@ -1,7 +1,7 @@
 {
   "name": "unplugin-code-sample",
   "type": "module",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "packageManager": "pnpm@9.9.0",
   "description": "Help you display code examples of the current page, support multiple packers, powered by unplugin",
   "author": "ray-d-song",
