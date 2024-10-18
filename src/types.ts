@@ -3,3 +3,8 @@ export interface Options {
   exclude?: string | string[]
   removeInProd?: boolean
 }
+
+export interface MetaLine {
+  lineNum: number
+  content: string
+}

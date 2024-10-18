@@ -5,6 +5,8 @@ import type { UnpluginFactory } from 'unplugin'
 import { createUnplugin } from 'unplugin'
 import { createFilter } from '@rollup/pluginutils'
 import type { Options } from './types'
+import { processFold } from './libs/fold'
+import { processTruncate } from './libs/truncate'
 
 const defaultInclude = [
   '**/*.vue',
@@ -43,7 +45,27 @@ export function transform(code: string, id: string, options?: Options): string {
       return code.replace(/<code-sample[^>]*>[\s\S]*?<\/code-sample>/g, '')
     }
     const fileContent = fs.readFileSync(id, 'utf-8')
-    const base64Content = Buffer.from(fileContent).toString('base64')
+    
+    // check if <code-sample> has fold and truncate attribute
+    const foldOptRaw = code.match(/fold="([^"]+)"/)
+    const truncateOptRaw = code.match(/truncate="([^"]+)"/)
+
+    // parse fold and truncate
+    const foldOptions = foldOptRaw ? JSON.parse(foldOptRaw[1]) : []
+    const truncateOptions = truncateOptRaw ? JSON.parse(truncateOptRaw[1]) : []
+
+    let metaLines = fileContent.split('\n').map((content, index) => ({
+      lineNum: index + 1,
+      content
+    }))
+    const length = metaLines.length
+    // process fold and truncate
+    metaLines = processFold(metaLines, foldOptions, length)
+    metaLines = processTruncate(metaLines, truncateOptions, length)
+
+    const processedCode = metaLines.map(line => line.content).join('\n')
+
+    const base64Content = Buffer.from(processedCode).toString('base64')
     return code.replace(/<code-sample/g, `<code-sample data-sample-code="${base64Content}"`)
   }
   return code

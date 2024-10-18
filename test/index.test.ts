@@ -53,3 +53,33 @@ describe('vite-plugin-code-sample', () => {
     process.env.NODE_ENV = originalEnv
   })
 })
+
+describe('fold', () => {
+  const mockFileContent = 'const a = 1\nconst b = 2\nconst c = 3\n<code-sample fold="[[2, 4]]" />'
+  const mockResContent = 'const a = 1\n// ...'
+  const mockBase64Content = Buffer.from(mockResContent).toString('base64')
+  
+  beforeEach(() => {
+    vi.mocked(fs.readFileSync).mockReturnValue(mockFileContent)
+  })
+
+  it('should fold code', () => {
+    const result = transform!(mockFileContent, 'test.vue')
+    expect(result).toBe(`const a = 1\nconst b = 2\nconst c = 3\n<code-sample data-sample-code="${mockBase64Content}" fold="[[2, 4]]" />`)
+  })
+})
+
+describe('truncate', () => {
+  const mockFileContent = 'const a = 1\nconst b = 2\nconst c = 3\n<code-sample truncate="[[1, 2]]" />'
+  const mockResContent = 'const a = 1\nconst b = 2'
+  const mockBase64Content = Buffer.from(mockResContent).toString('base64')
+
+  beforeEach(() => {
+    vi.mocked(fs.readFileSync).mockReturnValue(mockFileContent)
+  })
+
+  it('should truncate code', () => {
+    const result = transform!(mockFileContent, 'test.vue')
+    expect(result).toBe(`const a = 1\nconst b = 2\nconst c = 3\n<code-sample data-sample-code="${mockBase64Content}" truncate="[[1, 2]]" />`)
+  })
+})

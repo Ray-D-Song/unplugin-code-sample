@@ -1,6 +1,8 @@
 <script setup lang="ts">
 const props = defineProps<{
   dataSampleCode?: string
+  fold?: string
+  truncate?: string
 }>()
 
 const code = atob(props.dataSampleCode ?? '')

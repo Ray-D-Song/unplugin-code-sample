@@ -66,6 +66,16 @@ export default function CodeSample({ dataSampleCode }: CodeSampleProps) {
 }
 ```
 
+## Fold and Truncate
+
+You can use `fold` and `truncate` to control the code sample.
+
+```html
+<!-- fold the code between line 1 and 2, and line 5 and 7 -->
+<!-- truncate the code between line 3 and 4, and line 6 and 8 -->
+<code-sample fold="[[1, 2], [5, 7]]" truncate="[[3, 4], [6, 8]]" />
+```
+
 ## Options
 
 ```ts
