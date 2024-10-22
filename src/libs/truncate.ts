@@ -1,27 +1,29 @@
-import type { MetaLine } from '../types'
-import { check } from './check'
+import type { MetaLine } from "../types";
+import { check } from "./check";
 
-function processTruncate(code: MetaLine[], options: [number, number][], length: number): MetaLine[] {
+function processTruncate(
+  code: MetaLine[],
+  options: [number, number][],
+  length: number
+): MetaLine[] {
   if (options.length === 0) {
-    return code
+    return code;
   }
-  const { valid, message } = check(code, options, length)
+  const { valid, message } = check(code, options, length);
   if (!valid) {
-    throw new Error(message)
+    throw new Error(message);
   }
 
   // sort by start
-  options.sort((a, b) => a[0] - b[0])
+  options.sort((a, b) => a[0] - b[0]);
 
-  let newCode: MetaLine[] = []
+  let newCode: MetaLine[] = [];
   for (const [start, end] of options) {
-    const startIdx = code.findIndex(item => item.lineNum === start)
-    const endIdx = code.findIndex(item => item.lineNum === end)
-    newCode = newCode.concat(code.slice(startIdx, endIdx + 1))
+    const startIdx = code.findIndex((item) => item.lineNum === start);
+    const endIdx = code.findIndex((item) => item.lineNum === end);
+    newCode = newCode.concat(code.slice(startIdx, endIdx + 1));
   }
-  return newCode
+  return newCode;
 }
 
-export {
-  processTruncate
-}
+export { processTruncate };

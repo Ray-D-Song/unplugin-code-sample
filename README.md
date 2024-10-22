@@ -1,6 +1,6 @@
 ## unplugin-code-sample
 
-This is a unplugin for displaying code samples of the current page, support multiple packers.  
+This is a unplugin for displaying code samples of the current page, support multiple packers.
 
 ## Features
 
@@ -19,14 +19,14 @@ pnpm i unplugin-code-sample
 
 ```js
 // vite.config.js
-import codeSample from 'unplugin-code-sample/vite'
+import codeSample from "unplugin-code-sample/vite";
 
 export default defineConfig({
   plugins: [codeSample()],
-})
+});
 ```
 
-> You should put `unplugin-code-sample` plugin before other plugins that process the code. 
+> You should put `unplugin-code-sample` plugin before other plugins that process the code.
 
 ```html
 <!-- Place the tag in the file where you want to display the source code -->
@@ -40,10 +40,10 @@ You can write a Vue component like this to use data:
 ```vue
 <script setup lang="ts">
 const props = defineProps<{
-  dataSampleCode?: string
-}>()
+  dataSampleCode?: string;
+}>();
 
-const code = atob(props.dataSampleCode ?? '')
+const code = atob(props.dataSampleCode ?? "");
 </script>
 
 <template>
@@ -51,18 +51,22 @@ const code = atob(props.dataSampleCode ?? '')
 </template>
 ```
 
-React:  
+React:
 
 ```tsx
-import React from 'react'
+import React from "react";
 
 interface CodeSampleProps {
-  dataSampleCode?: string
+  dataSampleCode?: string;
 }
 
 export default function CodeSample({ dataSampleCode }: CodeSampleProps) {
-  const code = atob(dataSampleCode ?? '')
-  return <pre><code>{code}</code></pre>
+  const code = atob(dataSampleCode ?? "");
+  return (
+    <pre>
+      <code>{code}</code>
+    </pre>
+  );
 }
 ```
 
@@ -74,6 +78,19 @@ You can use `fold` and `truncate` to control the code sample.
 <!-- fold the code between line 1 and 2, and line 5 and 7 -->
 <!-- truncate the code between line 3 and 4, and line 6 and 8 -->
 <code-sample fold="[[1, 2], [5, 7]]" truncate="[[3, 4], [6, 8]]" />
+```
+
+## Custom Tag Name
+
+You can use custom tag name by setting the `tagName` option.
+
+```js
+// vite.config.js
+import codeSample from "unplugin-code-sample/vite";
+
+export default defineConfig({
+  plugins: [codeSample({ tagName: ["TestTag"] })],
+});
 ```
 
 ## Options
@@ -89,12 +106,19 @@ export interface Options {
 
   exclude?: string | string[]
 
-  /** 
+  /**
    * Remove the code sample in production environment
    *
    * @default false
    */
   removeInProd?: boolean
+
+  /**
+   * Custom tag name
+   *
+   * @default ['code-sample', 'CodeSample', 'codeSample']
+   */
+  tagName?: string[]
 }
 ```
 

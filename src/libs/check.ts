@@ -1,16 +1,20 @@
-import type { MetaLine } from '../types'
+import type { MetaLine } from "../types";
 
-function check(code: MetaLine[], options: [number, number][], length: number): {
-  valid: boolean
-  message: string
+function check(
+  code: MetaLine[],
+  options: [number, number][],
+  length: number
+): {
+  valid: boolean;
+  message: string;
 } {
   // check if fold is valid
   for (const [start, end] of options) {
     if (start > end) {
       return {
         valid: false,
-        message: `Invalid input: start ${start} > end ${end}`
-      }
+        message: `Invalid input: start ${start} > end ${end}`,
+      };
     }
   }
   // check if fold is in the code
@@ -18,16 +22,14 @@ function check(code: MetaLine[], options: [number, number][], length: number): {
     if (start > length || end > length) {
       return {
         valid: false,
-        message: `Invalid input: start ${start} or end ${end} > length ${length}`
-      }
+        message: `Invalid input: start ${start} or end ${end} > length ${length}`,
+      };
     }
   }
   return {
     valid: true,
-    message: ''
-  }
+    message: "",
+  };
 }
 
-export {
-  check
-}
+export { check };

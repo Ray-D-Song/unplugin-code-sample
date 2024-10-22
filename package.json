@@ -87,7 +87,7 @@
   "scripts": {
     "build": "npx rollup -c && node scripts/cp_type.mjs",
     "dev": "npx rollup -c -w",
-    "lint": "eslint .",
+    "format": "oxlint --fix --fix-suggestions --fix-dangerously && prettier --write .",
     "prepublishOnly": "npm run build",
     "release": "bumpp && npm publish",
     "test": "vitest"

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import CodeSample from './components/CodeSample.vue'
+import { ref } from "vue";
+import CodeSample from "./components/CodeSample.vue";
+import TestTag from "./components/TestTag.vue";
 
-const count = ref(0)
+const count = ref(0);
 </script>
 
 <template>
@@ -13,7 +14,12 @@ const count = ref(0)
       <button @click="count++" class="btn">Increment</button>
     </div>
     <div class="code-sample">
-      <code-sample truncate="[[1, 10], [12, 15]]" fold="[[12, 14]]"></code-sample>
+      <code-sample
+        truncate="[[1, 10], [12, 15]]"
+        fold="[[12, 14]]"
+      ></code-sample>
+      <CodeSample truncate="[[1, 10], [12, 15]]" fold="[[12, 14]]"></CodeSample>
+      <TestTag truncate="[[1, 10], [12, 15]]" fold="[[12, 14]]"></TestTag>
     </div>
   </main>
 </template>
