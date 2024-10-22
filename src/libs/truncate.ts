@@ -15,7 +15,9 @@ function processTruncate(code: MetaLine[], options: [number, number][], length: 
 
   let newCode: MetaLine[] = []
   for (const [start, end] of options) {
-    newCode = newCode.concat(code.slice(start-1, end))
+    const startIdx = code.findIndex(item => item.lineNum === start)
+    const endIdx = code.findIndex(item => item.lineNum === end)
+    newCode = newCode.concat(code.slice(startIdx, endIdx + 1))
   }
   return newCode
 }

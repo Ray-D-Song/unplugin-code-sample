@@ -12,7 +12,9 @@ function processFold(code: MetaLine[], options: [number, number][], length: numb
   options.forEach(([start, end]) => {
     // line start end
     // insert // ...
-    code.splice(start-1, end - start + 1, {
+    const startIdx = code.findIndex(item => item.lineNum === start)
+    const endIdx = code.findIndex(item => item.lineNum === end)
+    code.splice(startIdx, endIdx - startIdx + 1, {
       lineNum: start,
       content: '// ...'
     })

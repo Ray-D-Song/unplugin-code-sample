@@ -13,7 +13,7 @@ const count = ref(0)
       <button @click="count++" class="btn">Increment</button>
     </div>
     <div class="code-sample">
-      <code-sample fold="[[21, 65]]" truncate="[[8, 65]]"></code-sample>
+      <code-sample truncate="[[1, 10], [12, 15]]" fold="[[12, 14]]"></code-sample>
     </div>
   </main>
 </template>
