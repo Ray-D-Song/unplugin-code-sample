@@ -1,0 +1,66 @@
+import { createFetch } from '@vueuse/core';
+import { local } from '@/utils/storage'
+import { handleRefreshToken } from '@/utils/token';
+import { t } from '@/modules/i18n';
+
+const useRequest = createFetch({
+  baseUrl: import.meta.env.VITE_BASE_URL ?? '',
+  options: {
+    beforeFetch(ctx) {
+      ctx.options.headers = {
+        ...ctx.options.headers,
+        Authorization: `Bearer ${local.get('accessToken') ?? ''}`,
+      }
+    },
+    async afterFetch(ctx) {
+      const parsedData = await processResponse(ctx.response)
+      if (parsedData) {
+        ctx.data = parsedData
+      } else {
+        ctx.data = null
+      }
+      return ctx
+    },
+    onFetchError(ctx) {
+      if (ctx.error instanceof Error) {
+        switch (ctx.error.message) {
+          case 'network':
+            window.$message?.error(t('error.network'))
+            break
+          case 'unauthorized':
+            window.$message?.error(t('error.unauthorized'))
+            break
+          case 'failed':
+            // do nothing, error message is handled in processResponse
+            break
+          default:
+            console.error('ctx.error', ctx.error)
+            window.$message?.error(t('error.unknown'))
+        }
+      }
+      return ctx
+    },
+  },
+})
+
+async function processResponse(response: Response): Promise<any | undefined> {
+  if (!response.ok) {
+    throw new Error('network')
+  }
+  const parsedResponse: {
+    code: number
+    data: any
+    message: string
+  } = await response.json()
+  if (parsedResponse.code === 401) {
+    handleRefreshToken()
+    throw new Error('unauthorized')
+  }
+  if (parsedResponse.code !== 200) {
+    window.$message?.error(t(parsedResponse.message))
+    throw new Error('failed')
+  }
+  return parsedResponse.data
+}
+
+export default useRequest

@@ -41,46 +41,48 @@ export function transform(code: string, id: string, options?: Options): string {
   const tagName = options?.tagName
     ? options.tagName.concat(defaultTagName)
     : defaultTagName;
-  const tagRegex = new RegExp(`<(${tagName.join("|")})`, "g");
+  const tagRegex = new RegExp(
+    `<(${tagName.join("|")})([^>]*)>([\\s\\S]*?)<\\/\\1>`,
+    "g"
+  );
 
   if (tagRegex.test(code)) {
     const removeInProd = options?.removeInProd ?? true;
     if (removeInProd && process.env.NODE_ENV === "production") {
       // remove all code-sample tags in production
-      return code.replace(
-        new RegExp(
-          `<(${tagName.join("|")})[^>]*>[\\s\\S]*?</(${tagName.join("|")})>`,
-          "g"
-        ),
-        ""
-      );
+      return code.replace(tagRegex, "");
     }
-    const fileContent = fs.readFileSync(id, "utf-8");
 
-    // check if any of the supported tags has fold and truncate attribute
-    const foldOptRaw = code.match(/fold="([^"]+)"/);
-    const truncateOptRaw = code.match(/truncate="([^"]+)"/);
+    return code.replace(tagRegex, (match, tag, attributes, content) => {
+      const fileSrcMatch = attributes.match(/source="([^"]+)"/);
+      const fileContent = fileSrcMatch
+        ? fs.readFileSync(fileSrcMatch[1], "utf-8")
+        : fs.readFileSync(id, "utf-8");
 
-    // parse fold and truncate
-    const foldOptions = foldOptRaw ? JSON.parse(foldOptRaw[1]) : [];
-    const truncateOptions = truncateOptRaw ? JSON.parse(truncateOptRaw[1]) : [];
+      // 处理 fold 和 truncate 选项
+      const foldOptRaw = attributes.match(/fold="([^"]+)"/);
+      const truncateOptRaw = attributes.match(/truncate="([^"]+)"/);
 
-    let metaLines = fileContent.split("\n").map((content, index) => ({
-      lineNum: index + 1,
-      content,
-    }));
-    const length = metaLines.length;
-    // process fold and truncate
-    metaLines = processFold(metaLines, foldOptions, length);
-    metaLines = processTruncate(metaLines, truncateOptions, length);
+      const foldOptions = foldOptRaw ? JSON.parse(foldOptRaw[1]) : [];
+      const truncateOptions = truncateOptRaw
+        ? JSON.parse(truncateOptRaw[1])
+        : [];
 
-    const processedCode = metaLines.map((line) => line.content).join("\n");
+      let metaLines = fileContent.split("\n").map((content, index) => ({
+        lineNum: index + 1,
+        content,
+      }));
+      const length = metaLines.length;
 
-    const base64Content = Buffer.from(processedCode).toString("base64");
-    return code.replace(
-      tagRegex,
-      (match, tag) => `<${tag} data-sample-code="${base64Content}"`
-    );
+      // 处理 fold 和 truncate
+      metaLines = processFold(metaLines, foldOptions, length);
+      metaLines = processTruncate(metaLines, truncateOptions, length);
+
+      const processedCode = metaLines.map((line) => line.content).join("\n");
+      const base64Content = Buffer.from(processedCode).toString("base64");
+
+      return `<${tag}${attributes} data-sample-code="${base64Content}">${content}</${tag}>`;
+    });
   }
   return code;
 }

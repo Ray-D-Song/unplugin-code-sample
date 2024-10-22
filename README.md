@@ -1,18 +1,18 @@
 ## unplugin-code-sample
 
-This is a unplugin for displaying code samples of the current page, support multiple packers.
+This is a unplugin for displaying code samples, support multiple packers.
 
 ## Features
 
-- Support multiple packers: Vite, Webpack, Rollup, esbuild, etc.
-- Automatically extract code from current page
+- Support multiple packers: Vite, Webpack, Rollup, esbuild, etc
+- Automatically extract code from current page, you can also specify the source option to read the specified file
 - Optionally remove code samples in production environment
 - Support custom include/exclude files
 
 ## Install
 
 ```bash
-pnpm i unplugin-code-sample
+npm i -D unplugin-code-sample
 ```
 
 ## Usage
@@ -91,6 +91,14 @@ import codeSample from "unplugin-code-sample/vite";
 export default defineConfig({
   plugins: [codeSample({ tagName: ["TestTag"] })],
 });
+```
+
+## Specify the source path
+
+If you don't want to display the current file, but want to specify the content of the file to be displayed, you can pass the source option to the tag, and the value is the location relative to the root directory.
+
+```html
+<code-sample source="./hooks/useRequest.txt" />
 ```
 
 ## Options

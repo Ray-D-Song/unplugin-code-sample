@@ -3,6 +3,7 @@ const props = defineProps<{
   dataSampleCode?: string;
   fold?: string;
   truncate?: string;
+  source?: string;
 }>();
 
 const code = atob(props.dataSampleCode ?? "");
