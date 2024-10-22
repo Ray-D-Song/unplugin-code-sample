@@ -30,7 +30,7 @@ export default defineConfig({
 
 ```html
 <!-- Place the tag in the file where you want to display the source code -->
-<code-sample />
+<code-sample></code-sample>
 ```
 
 The plugin will encode the content of the file where the tag is located in base64, and then pass it as the `data-sample-code` attribute of the tag.
@@ -77,7 +77,7 @@ You can use `fold` and `truncate` to control the code sample.
 ```html
 <!-- fold the code between line 1 and 2, and line 5 and 7 -->
 <!-- truncate the code between line 3 and 4, and line 6 and 8 -->
-<code-sample fold="[[1, 2], [5, 7]]" truncate="[[3, 4], [6, 8]]" />
+<code-sample fold="[[1, 2], [5, 7]]" truncate="[[3, 4], [6, 8]]"></code-sample>
 ```
 
 ## Custom Tag Name
@@ -98,7 +98,7 @@ export default defineConfig({
 If you don't want to display the current file, but want to specify the content of the file to be displayed, you can pass the source option to the tag, and the value is the location relative to the root directory.
 
 ```html
-<code-sample source="./hooks/useRequest.txt" />
+<code-sample source="./hooks/useRequest.txt"></code-sample>
 ```
 
 ## Options
@@ -129,6 +129,10 @@ export interface Options {
   tagName?: string[]
 }
 ```
+
+## Known Issues
+
+- Not support self-closing tag
 
 ## License
 

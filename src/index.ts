@@ -59,7 +59,6 @@ export function transform(code: string, id: string, options?: Options): string {
         ? fs.readFileSync(fileSrcMatch[1], "utf-8")
         : fs.readFileSync(id, "utf-8");
 
-      // 处理 fold 和 truncate 选项
       const foldOptRaw = attributes.match(/fold="([^"]+)"/);
       const truncateOptRaw = attributes.match(/truncate="([^"]+)"/);
 
@@ -74,7 +73,6 @@ export function transform(code: string, id: string, options?: Options): string {
       }));
       const length = metaLines.length;
 
-      // 处理 fold 和 truncate
       metaLines = processFold(metaLines, foldOptions, length);
       metaLines = processTruncate(metaLines, truncateOptions, length);
 
