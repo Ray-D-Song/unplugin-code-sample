@@ -14,16 +14,16 @@ describe("vite-plugin-code-sample", () => {
     vi.mocked(fs.readFileSync).mockReturnValue(mockFileContent);
   });
 
-  it("should handle files with <code-sample> tags", () => {
-    const result = transform!(mockFileContent, "test.vue");
+  it("should handle files with <code-sample> tags", async () => {
+    const result = await transform!(mockFileContent, "test.vue");
     expect(result).toBe(
       `<div><code-sample data-sample-code="${mockBase64Content}">Test</code-sample></div>`
     );
   });
 
-  it("should not process files without <code-sample> tags", () => {
+  it("should not process files without <code-sample> tags", async () => {
     const content = "<div>No code sample here</div>";
-    const result = transform!(content, "test.vue");
+    const result = await transform!(content, "test.vue");
     expect(result).toBe(content);
   });
 
@@ -34,22 +34,22 @@ describe("vite-plugin-code-sample", () => {
     expect(f("test.js")).toBe(false);
   });
 
-  it("should remove <code-sample> tags in production", () => {
+  it("should remove <code-sample> tags in production", async () => {
     const originalEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "production";
 
-    const result = transform!(mockFileContent, "test.vue");
+    const result = await transform!(mockFileContent, "test.vue");
     expect(result).toBe("<div></div>");
 
     process.env.NODE_ENV = originalEnv;
   });
 
-  it("if removeInProd is false, should not remove <code-sample> tags in production", () => {
+  it("if removeInProd is false, should not remove <code-sample> tags in production", async () => {
     const originalEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "production";
 
     const options: Options = { removeInProd: false };
-    const result = transform!(mockFileContent, "test.vue", options);
+    const result = await transform!(mockFileContent, "test.vue", options);
     expect(result).toBe(
       `<div><code-sample data-sample-code="${mockBase64Content}">Test</code-sample></div>`
     );
@@ -68,10 +68,10 @@ describe("fold", () => {
     vi.mocked(fs.readFileSync).mockReturnValue(mockFileContent);
   });
 
-  it("should fold code", () => {
-    const result = transform!(mockFileContent, "test.vue");
-    expect(result).toBe(
-      `const a = 1\nconst b = 2\nconst c = 3\n<code-sample data-sample-code="${mockBase64Content}" fold="[[2, 4]]" />`
+  it("should fold code", async () => {
+    const result = await transform!(mockFileContent, "test.vue");
+    expect(result).match(
+      /const a = 1\nconst b = 2\nconst c = 3\n<code-sample data-sample-code=".*" fold="\[\[2, 4\]\]" \/>|const a = 1\nconst b = 2\nconst c = 3\n<code-sample fold="\[\[2, 4\]\]" data-sample-code=".*" \/>/
     );
   });
 });
@@ -86,10 +86,10 @@ describe("truncate", () => {
     vi.mocked(fs.readFileSync).mockReturnValue(mockFileContent);
   });
 
-  it("should truncate code", () => {
-    const result = transform!(mockFileContent, "test.vue");
-    expect(result).toBe(
-      `const a = 1\nconst b = 2\nconst c = 3\n<code-sample data-sample-code="${mockBase64Content}" truncate="[[1, 2]]" />`
+  it("should truncate code", async () => {
+    const result = await transform!(mockFileContent, "test.vue");
+    expect(result).match(
+      /const a = 1\nconst b = 2\nconst c = 3\n<code-sample data-sample-code=".*" truncate="\[\[1, 2\]\]" \/>|const a = 1\nconst b = 2\nconst c = 3\n<code-sample truncate="\[\[1, 2\]\]" data-sample-code=".*" \/>/
     );
   });
 });

@@ -1,12 +1,9 @@
-import fs from "node:fs";
-import { Buffer } from "node:buffer";
 import process from "node:process";
 import type { UnpluginFactory } from "unplugin";
 import { createUnplugin } from "unplugin";
 import { createFilter } from "@rollup/pluginutils";
 import type { Options } from "./types";
-import { processFold } from "./libs/fold";
-import { processTruncate } from "./libs/truncate";
+import { rewrite, handleRemoveInProd } from "./libs/htmlrewriter";
 
 const defaultInclude = [
   "**/*.vue",
@@ -27,8 +24,8 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (
     transformInclude(id) {
       return filter(options)(id);
     },
-    transform(code, id) {
-      return transform(code, id, options);
+    async transform(code, id) {
+      return await transform(code, id, options);
     },
   };
 };
@@ -37,52 +34,32 @@ export function filter(options: Options): (id: string) => boolean {
   return createFilter(options.include || defaultInclude, options.exclude);
 }
 
-export function transform(code: string, id: string, options?: Options): string {
-  const tagName = options?.tagName
+export async function transform(code: string, id: string, options?: Options): Promise<string> {
+  const tagNames = options?.tagName
     ? options.tagName.concat(defaultTagName)
     : defaultTagName;
-  const tagRegex = new RegExp(
-    `<(${tagName.join("|")})([^>]*)>([\\s\\S]*?)<\\/\\1>`,
-    "g"
-  );
 
-  if (tagRegex.test(code)) {
-    const removeInProd = options?.removeInProd ?? true;
-    if (removeInProd && process.env.NODE_ENV === "production") {
-      // remove all code-sample tags in production
-      return code.replace(tagRegex, "");
-    }
-
-    return code.replace(tagRegex, (match, tag, attributes, content) => {
-      const fileSrcMatch = attributes.match(/source="([^"]+)"/);
-      const fileContent = fileSrcMatch
-        ? fs.readFileSync(fileSrcMatch[1], "utf-8")
-        : fs.readFileSync(id, "utf-8");
-
-      const foldOptRaw = attributes.match(/fold="([^"]+)"/);
-      const truncateOptRaw = attributes.match(/truncate="([^"]+)"/);
-
-      const foldOptions = foldOptRaw ? JSON.parse(foldOptRaw[1]) : [];
-      const truncateOptions = truncateOptRaw
-        ? JSON.parse(truncateOptRaw[1])
-        : [];
-
-      let metaLines = fileContent.split("\n").map((content, index) => ({
-        lineNum: index + 1,
-        content,
-      }));
-      const length = metaLines.length;
-
-      metaLines = processFold(metaLines, foldOptions, length);
-      metaLines = processTruncate(metaLines, truncateOptions, length);
-
-      const processedCode = metaLines.map((line) => line.content).join("\n");
-      const base64Content = Buffer.from(processedCode).toString("base64");
-
-      return `<${tag}${attributes} data-sample-code="${base64Content}">${content}</${tag}>`;
-    });
+  if (tagNames.length === 0) {
+    return code;
   }
-  return code;
+
+  let hasMatch = false;
+  tagNames.forEach((tagName) => {
+    if (code.includes(tagName)) {
+      hasMatch = true;
+    }
+  });
+
+  if (!hasMatch) {
+    return code;
+  }
+
+  const removeInProd = options?.removeInProd ?? true;
+  if (removeInProd && process.env.NODE_ENV === "production") {
+    return await handleRemoveInProd(code, { tagNames });
+  }
+
+  return await rewrite(code, { fileContent: code, tagNames });
 }
 
 export const unplugin = /* #__PURE__ */ createUnplugin(unpluginFactory);

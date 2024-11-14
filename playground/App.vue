@@ -23,6 +23,16 @@ const count = ref(0);
         fold="[[12, 14]]"
         source="./hooks/useRequest.txt"
       ></CodeSample>
+      <CodeSample
+        truncate="[[1, 3], [12, 15]]"
+        fold="[[12, 14]]"
+        source="./hooks/useRequest.txt"
+      />
+      <TestTag
+        truncate="[[1, 3], [12, 15]]"
+        fold="[[12, 14]]"
+        source="./hooks/useRequest.txt"
+      />
     </div>
   </main>
 </template>
