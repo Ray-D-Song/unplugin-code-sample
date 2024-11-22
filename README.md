@@ -130,10 +130,6 @@ export interface Options {
 }
 ```
 
-## Known Issues
-
-- Not support self-closing tag
-
 ## License
 
 MIT
